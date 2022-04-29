@@ -1,0 +1,22 @@
+{
+  "name": "ha-zoom-card",
+  "packageManager": "yarn@3.2.0",
+  "source": "src/ha-zoom-card.js",
+  "main": "dist/ha-zoom-card.js",
+  "scripts": {
+    "build": "parcel build"
+  },
+  "targets": {
+    "main": {
+      "optimize": true,
+      "includeNodeModules": true
+    }
+  },
+  "devDependencies": {
+    "@panzoom/panzoom": "link:/Users/cdonovan/Projects/panzoom",
+    "parcel": "^2.5.0"
+  },
+  "comments": {
+    "devDependencies": "Can remove panzoom link if/when https://github.com/timmywil/panzoom/pull/618 gets merged"
+  }
+}

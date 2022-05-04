@@ -12,3 +12,6 @@
 
 # Build assets
 dist
+
+# IDE
+.vscode

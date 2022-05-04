@@ -4,6 +4,7 @@
   "source": "src/ha-zoom-card.js",
   "main": "dist/ha-zoom-card.js",
   "scripts": {
+    "start": "parcel watch",
     "build": "parcel build"
   },
   "targets": {
@@ -14,7 +15,10 @@
   },
   "devDependencies": {
     "@panzoom/panzoom": "link:/Users/cdonovan/Projects/panzoom",
-    "parcel": "^2.5.0"
+    "@yarnpkg/sdks": "^3.0.0-rc.4",
+    "eslint": "^8.14.0",
+    "parcel": "^2.5.0",
+    "prettier": "^2.6.2"
   },
   "comments": {
     "devDependencies": "Can remove panzoom link if/when https://github.com/timmywil/panzoom/pull/618 gets merged"

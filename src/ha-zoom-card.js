@@ -1,4 +1,5 @@
 import Panzoom from "@panzoom/panzoom"
+import Deferred from "./Deferred"
 
 class ZoomCard extends HTMLElement {
   constructor() {
@@ -13,10 +14,7 @@ class ZoomCard extends HTMLElement {
   }
 
   setConfig(config) {
-    this._cardSize = {}
-    this._cardSize.promise = new Promise(
-      (resolve) => (this._cardSize.resolve = resolve)
-    )
+    this.rendered = new Deferred()
 
     if (!config || !config.card) {
       throw new Error("Card config incorrect")
@@ -52,7 +50,7 @@ class ZoomCard extends HTMLElement {
     this.appendChild(root)
 
     // Calculate card size
-    this._cardSize.resolve()
+    this.rendered.resolve()
   }
 
   async createCardElement(cardConfig) {
@@ -87,7 +85,7 @@ class ZoomCard extends HTMLElement {
     }
 
     const element = createThing(tag, cardConfig)
-    element.hass = this._hass
+    element.hass = this.hass
     element.addEventListener(
       "ll-rebuild",
       (ev) => {
@@ -102,7 +100,7 @@ class ZoomCard extends HTMLElement {
   }
 
   set hass(hass) {
-    this._hass = hass
+    this.hass = hass
     if (this.card) {
       this.card.hass = hass
     }
@@ -158,7 +156,7 @@ class ZoomCard extends HTMLElement {
   }
 
   async getCardSize() {
-    await this._cardSize.promise
+    await this.rendered
     return await this._computeCardSize(this.card)
   }
 }

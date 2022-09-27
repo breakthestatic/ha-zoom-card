@@ -9,6 +9,7 @@
     "sourceType": "module"
   },
   "rules": {
-    "prefer-const": "error"
+    "prefer-const": "error",
+    "ignoreRestSiblings": true
   }
 }

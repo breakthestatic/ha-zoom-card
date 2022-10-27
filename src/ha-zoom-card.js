@@ -110,6 +110,27 @@ class ZoomCard extends HTMLElement {
     }
   }
 
+  initPanzoom() {
+    const {tapTimeout, target, zoomOptions} = this.config
+    const {step = 1, maxScale = 6, ...config} = zoomOptions || {}
+    const zoomTarget = target
+      ? this.zoomable.querySelector(target)
+      : this.zoomable.firstElementChild
+    this.panzoom = Panzoom(zoomTarget, {
+      contain: "outside",
+      step,
+      maxScale,
+      panOnlyWhenZoomed: true,
+      ...config,
+    })
+    zoomTarget.addEventListener("wheel", this.panzoom.zoomWithWheel)
+    zoomTarget.addEventListener(
+      "touchend",
+      doubleTap(this.handleZoom(), tapTimeout)
+    )
+    zoomTarget.addEventListener("dblclick", this.handleZoom())
+  }
+
   connectedCallback() {
     const fn = () => {
       this._card(this._refCard)
@@ -121,23 +142,16 @@ class ZoomCard extends HTMLElement {
       fn()
     }
 
-    if (!this.panzoom) {
-      const {zoomOptions, tapTimeout} = this.config
-      const {step = 1, maxScale = 6, ...config} = zoomOptions || {}
-      const zoomTarget = this.zoomable.firstElementChild
-      this.panzoom = Panzoom(zoomTarget, {
-        contain: "outside",
-        step,
-        maxScale,
-        panOnlyWhenZoomed: true,
-        ...config,
+    // Panzoom already initialized
+    if (this.panzoom) return
+
+    if (this.config.target) {
+      new MutationObserver(() => this.initPanzoom()).observe(this.zoomable, {
+        childList: true,
+        subtree: true,
       })
-      zoomTarget.addEventListener("wheel", this.panzoom.zoomWithWheel)
-      zoomTarget.addEventListener(
-        "touchend",
-        doubleTap(this.handleZoom(), tapTimeout)
-      )
-      zoomTarget.addEventListener("dblclick", this.handleZoom())
+    } else {
+      this.initPanzoom()
     }
   }
 

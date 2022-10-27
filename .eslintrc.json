@@ -10,6 +10,6 @@
   },
   "rules": {
     "prefer-const": "error",
-    "ignoreRestSiblings": true
+    "ignoreRestSiblings": 0
   }
 }

@@ -1,5 +1,6 @@
 import Panzoom from "@panzoom/panzoom"
 import {doubleTap} from "./handlers"
+import {removeBorders} from "./util"
 
 class ZoomCard extends HTMLElement {
   constructor() {
@@ -121,8 +122,25 @@ class ZoomCard extends HTMLElement {
       step,
       maxScale,
       panOnlyWhenZoomed: true,
+      setTransform: (_, {scale, x, y}) => {
+        // Remove transformations when scale is ~ 1
+        // Alleviates issue with extra pixels at bottom of zoomed element
+        if (scale < 1.001) {
+          this.panzoom.setStyle("transform", "")
+        } else {
+          this.panzoom.setStyle(
+            "transform",
+            `scale(${scale}) translate3d(${parseInt(x)}px, ${parseInt(
+              y
+            )}px, 0px)`
+          )
+        }
+      },
       ...config,
     })
+    if (zoomTarget.closest("ha-card") !== this.zoomable) {
+      removeBorders(zoomTarget.closest("ha-card"))
+    }
     zoomTarget.addEventListener("wheel", this.panzoom.zoomWithWheel)
     zoomTarget.addEventListener(
       "touchend",
@@ -180,16 +198,14 @@ class ZoomCard extends HTMLElement {
           this._card(searchEles[i])
         }
       } else {
-        element.shadowRoot.querySelector("ha-card").style.boxShadow = "none"
-        element.shadowRoot.querySelector("ha-card").style.borderRadius = "0px"
+        removeBorders(element.shadowRoot.querySelector("ha-card"))
       }
     } else {
       if (
         typeof element.querySelector === "function" &&
         element.querySelector("ha-card")
       ) {
-        element.querySelector("ha-card").style.boxShadow = "none"
-        element.querySelector("ha-card").style.borderRadius = "0px"
+        removeBorders(element.querySelector("ha-card"))
       }
       const searchEles = element.childNodes
       for (let i = 0; i < searchEles.length; i++) {

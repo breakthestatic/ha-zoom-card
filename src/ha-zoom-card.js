@@ -111,12 +111,16 @@ class ZoomCard extends HTMLElement {
     }
   }
 
-  initPanzoom() {
+  initPanzoom = () => {
     const {tapTimeout, target, zoomOptions} = this.config
     const {step = 1, maxScale = 6, ...config} = zoomOptions || {}
     const zoomTarget = target
       ? this.zoomable.querySelector(target)
       : this.zoomable.firstElementChild
+
+    // Don't init panzoom if already initialized or zoom target doesn't exist
+    if (this.panzoom || !zoomTarget) return
+
     this.panzoom = Panzoom(zoomTarget, {
       contain: "outside",
       step,
@@ -130,23 +134,20 @@ class ZoomCard extends HTMLElement {
         } else {
           this.panzoom.setStyle(
             "transform",
-            `scale(${scale}) translate3d(${parseInt(x)}px, ${parseInt(
-              y
-            )}px, 0px)`
+            `scale(${scale}) translate3d(${parseInt(x)}px, ${parseInt(y)}px, 0px)`
           )
         }
       },
       ...config,
     })
+
     if (zoomTarget.closest("ha-card") !== this.zoomable) {
       removeBorders(zoomTarget.closest("ha-card"))
     }
+
     zoomTarget.addEventListener("wheel", this.panzoom.zoomWithWheel)
-    zoomTarget.addEventListener(
-      "touchend",
-      doubleTap(this.handleZoom(), tapTimeout)
-    )
-    zoomTarget.addEventListener("dblclick", this.handleZoom())
+    zoomTarget.addEventListener("touchend", doubleTap(this.handleZoom, tapTimeout))
+    zoomTarget.addEventListener("dblclick", this.handleZoom)
   }
 
   connectedCallback() {
@@ -164,7 +165,7 @@ class ZoomCard extends HTMLElement {
     if (this.panzoom) return
 
     if (this.config.target) {
-      new MutationObserver(() => this.initPanzoom()).observe(this.zoomable, {
+      new MutationObserver(this.initPanzoom).observe(this.zoomable, {
         childList: true,
         subtree: true,
       })
@@ -173,7 +174,7 @@ class ZoomCard extends HTMLElement {
     }
   }
 
-  handleZoom = () => (event) => {
+  handleZoom = (event) => {
     if (this.panzoom.getScale() >= this.panzoom.getOptions().maxScale) {
       this.panzoom.reset(event)
     } else {
